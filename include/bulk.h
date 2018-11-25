@@ -55,7 +55,7 @@ public:
     empty = false;
   }
   
-  const std::chrono::system_clock::time_point& getTime(){
+  const std::chrono::system_clock::time_point& getTime() const{
     return firstCommandTime;
   }
   

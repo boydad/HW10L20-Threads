@@ -11,25 +11,35 @@ void PrintHandler::set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer){
 
 void PrintHandler::handle() {
   while(!bulkBuffer->empty()){
-    auto& bulk = bulkBuffer->front();      
-
-
-    const auto time = std::chrono::system_clock::to_time_t(bulk.getTime());
-    char name[17];
-    strftime(name, 17, "bulk%X.log", localtime(&time));    
+    Bulk bulk = this->extractBulk();    
+    const std::string name =  this->genName(bulk);    
     std::ofstream log(name, std::ofstream::app);
-
-    std::cout << "bulk: ";  
-    std::string sep{""};  
-
-    for(auto command: bulk.getCommands()){
-      std::cout << sep << command;
-      log << sep << command;
-      sep = ", ";
-    }
-    log << '\n';
-    std::cout << std::endl;
-
-    bulkBuffer->pop();
+    
+    this->print(log, bulk);
+    this->print(std::cout, bulk);    
   }
+}
+
+
+
+std::string PrintHandler::genName(const Bulk& bulk){
+  const auto time = std::chrono::system_clock::to_time_t(bulk.getTime());
+  char name[17];
+  strftime(name, 17, "bulk%X.log", localtime(&time));    
+  return std::string(name);
+}
+
+inline size_t PrintHandler::print(std::ostream& stream, Bulk& bulk){   
+  size_t count = 0;
+  std::string sep{""};  
+  
+  stream << "bulk: "; 
+  for(auto& command: bulk.getCommands()){    
+    stream << sep << command;
+    sep = ", ";
+    count++;
+  }
+  stream << '\n';
+  
+  return count;
 }
