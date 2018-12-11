@@ -3,7 +3,7 @@
 #include <math.h>
 #include <thread>
 #include "commandManager.h"
- 
+#include "threadComManager.h"
  
 
 

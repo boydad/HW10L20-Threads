@@ -66,6 +66,4 @@ public:
   auto getSize(){
     return commands.size();
   }
-  
-  
 };

@@ -1,8 +1,5 @@
 #pragma once
 
-#include "handl.h"
-
-
 PrintHandler::PrintHandler(): bulkBuffer(nullptr) {}
 
 void PrintHandler::set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer){
@@ -33,7 +30,7 @@ inline size_t PrintHandler::print(std::ostream& stream, Bulk& bulk){
   size_t count = 0;
   std::string sep{""};  
   
-  stream << "bulk: "; 
+  stream << "bulk(" << std::this_thread::get_id() << "): "; 
   for(auto& command: bulk.getCommands()){    
     stream << sep << command;
     sep = ", ";

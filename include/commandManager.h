@@ -14,32 +14,31 @@
 #pragma once
 
 
-#include <chrono>
 #include <vector>
+#include <memory>
 #include <queue>
 #include <string>
-#include <memory>
 
-#include "handl.h"
+#include "ihandler.h"
 #include "bulk.h"
 
 class CommandManager{
-protected:
+private:
   size_t maxBuffSize;
   size_t numOpenBracket;
   std::vector< std::shared_ptr<IHandler> > handlers;
+
+  inline void notify();
+  inline void addCustomBulk();
+  inline void delCustomBulk();
+  inline void addInBulk(std::string&& command);
+  inline bool isBulkFull();  
+  
+protected:  
   Bulk bulk;
   std::shared_ptr<std::queue<Bulk>> bulkBuffer;
-  
-  void notify();
-  void addCustomBulk();
-  void delCustomBulk();
-  void addInBulk(std::string&& command);
-  
   virtual void saveCurrentBulk();
-  inline bool isBulkFull();
   
-
   
 public:
   CommandManager(const int bulkSize);
@@ -47,40 +46,10 @@ public:
   CommandManager operator=(const CommandManager& other) = delete;
   virtual ~CommandManager();
   
-  void add(std::string&& command);  
-  void subscribe(const std::shared_ptr<IHandler>& hand);    
+  virtual void add(std::string&& command);  
+  void subscribe(const std::shared_ptr<IHandler>& hand);  
+  inline void finalize();  
 };
-
-class ThreadComManager: public CommandManager{
-  
-  void saveCurrentBulk() override{
-    std::lock_guard<std::mutex> lock{*bulkQueue};
-    
-    if(!bulk.isEmpty()){
-      bulkBuffer->push(std::move(bulk));
-      this->blockCount++;
-    }
-    
-    newBulk->notify_all();    
-  }
-  
-  std::shared_ptr<std::mutex> bulkQueue;
-  std::shared_ptr<std::condition_variable> newBulk;
-  size_t blockCount, commandCount, lineCount;
-  
-public:
-  ThreadComManager(const int bulkSize, 
-    std::shared_ptr<std::mutex>& bulkQueue,
-    std::shared_ptr<std::condition_variable>& newBulk):
-      CommandManager(bulkSize), bulkQueue(bulkQueue), newBulk(newBulk),
-      blockCount(0), commandCount(0), lineCount(0) {};
-    
-    ThreadComManager(const ThreadComManager& other) = delete;
-    ThreadComManager operator=(const ThreadComManager& other) = delete;
-      
-  
-};
-
 
 #include "commandManagar_impl.h"
 
