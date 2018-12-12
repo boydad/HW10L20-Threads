@@ -14,72 +14,32 @@
 #ifndef THREADSAVER_H
 #define THREADSAVER_H
 
+#include <memory>
+#include <mutex>
+
 #include "printHandler.h"
 
 class ThreadSaver: public PrintHandler{
+private:
   size_t blocksCount{0};
   size_t commandsCount{0};
-  bool* finish;
-  std::shared_ptr<std::mutex> bulkQueue;
-  std::shared_ptr<std::condition_variable> newBulk;
+  bool* finish{nullptr};
+  std::shared_ptr<std::mutex> bulkQueue{nullptr};
+  std::shared_ptr<std::condition_variable> newBulk{nullptr};
   
-
 public:
-  ThreadSaver(bool& finish, std::shared_ptr<std::mutex>& bulkQueue,
-    std::shared_ptr<std::condition_variable>& newBulk): 
-      PrintHandler(), 
-      finish(&finish),
-      bulkQueue(bulkQueue),
-      newBulk(newBulk) {};
-      
-  ~ThreadSaver(){};
+  ThreadSaver(): PrintHandler()
+  {};      
+  ~ThreadSaver()
+  {};
   
-//  void init(bool& finish, std::shared_ptr<std::mutex> bulkQueueBusi, 
-//      std::shared_ptr<std::condition_variable> newBulk){
-//    this->finish = &finish;
-//    this->bulkQueueBusi = bulkQueueBusi;
-//    this->newBulk = newBulk;
-//  }
-  
-  auto run(){               
-    while(!*finish){
-      std::unique_lock<std::mutex> lock{*bulkQueue};
-      
-      while(bulkBuffer->empty() and !*finish)
-        newBulk->wait(lock);
-      
-      if(!bulkBuffer->empty()){
-        this->handleBulk(lock);
-      }
-    }
-        
-    while(!bulkBuffer->empty()){
-      bulkQueue->lock();
-      if(!bulkBuffer->empty()){
-        this->handleBulk(*bulkQueue);
-      } else{
-        bulkQueue->unlock();
-      }
-    }
-        
-    return std::make_pair(blocksCount, commandsCount);    
-  };
-  
-  
-  template <typename T>
-  void handleBulk(T& lock){
-    Bulk bulk = this->extractBulk();    
-    lock.unlock();
-    blocksCount++;
-
-    const std::string name =  this->genName(bulk);    
-    std::ofstream log(name, std::ofstream::app);
-
-    commandsCount += this->print(log, bulk);
-    this->print(std::cout, bulk);   
-  }
+  void init(bool& finish, 
+            const std::shared_ptr<std::mutex>& bulkQueue, 
+            const std::shared_ptr<std::condition_variable>& newBulk);
+  std::pair<size_t, size_t> run();    
+  template <typename T>   void handleBulk(T& lock);
 };
 
-
+#include "threadSaver_impl.h"
 #endif /* THREADSAVER_H */
 

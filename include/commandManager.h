@@ -46,7 +46,7 @@ public:
   CommandManager operator=(const CommandManager& other) = delete;
   virtual ~CommandManager();
   
-  virtual void add(std::string&& command);  
+  void add(std::string&& command);  
   void subscribe(const std::shared_ptr<IHandler>& hand);  
   inline void finalize();  
 };

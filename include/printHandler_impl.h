@@ -1,12 +1,18 @@
 #pragma once
 
-PrintHandler::PrintHandler(): bulkBuffer(nullptr) {}
+#include "printHandler.h"
 
-void PrintHandler::set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer){
+
+PrintHandler::PrintHandler(): bulkBuffer(nullptr)
+{}
+
+void PrintHandler::set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer)
+{
   this->bulkBuffer = bulkBuffer;
 }
 
-void PrintHandler::handle() {
+void PrintHandler::handle()
+{
   while(!bulkBuffer->empty()){
     Bulk bulk = this->extractBulk();    
     const std::string name =  this->genName(bulk);    
@@ -17,26 +23,32 @@ void PrintHandler::handle() {
   }
 }
 
-
-
-std::string PrintHandler::genName(const Bulk& bulk){
+std::string PrintHandler::genName(const Bulk& bulk)
+{
   const auto time = std::chrono::system_clock::to_time_t(bulk.getTime());
   char name[17];
   strftime(name, 17, "bulk%X.log", localtime(&time));    
   return std::string(name);
 }
 
-inline size_t PrintHandler::print(std::ostream& stream, Bulk& bulk){   
+size_t PrintHandler::print(std::ostream& stream, const Bulk& bulk)
+{   
   size_t count = 0;
   std::string sep{""};  
   
-  stream << "bulk(" << std::this_thread::get_id() << "): "; 
-  for(auto& command: bulk.getCommands()){    
+  stream << "bulk: "; 
+  for(const auto& command: bulk.getCommands()){    
     stream << sep << command;
     sep = ", ";
     count++;
   }
-  stream << '\n';
-  
+  stream << '\n';  
   return count;
+}
+
+Bulk PrintHandler::extractBulk()
+{
+  Bulk bulk = std::move(bulkBuffer->front());      
+  bulkBuffer->pop();
+  return bulk;
 }

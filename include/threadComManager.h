@@ -14,51 +14,38 @@
 #ifndef THREADCOMMANAGER_H
 #define THREADCOMMANAGER_H
 
-//#include <vector>
-//#include <queue>
-//#include <string>
-//#include <memory>
+#include <memory>
+#include <mutex>
+#include <condition_variable>
 
 #include "commandManager.h"
 #include "threadSaver.h"
-
+#include "loger.h"
 
 class ThreadComManager: public CommandManager{
-  
-  virtual void saveCurrentBulk() override;
-  
+private:
   std::shared_ptr<std::mutex> bulkQueue;
   std::shared_ptr<std::condition_variable> newBulk;
   size_t blockCount, commandCount, lineCount;
   bool finish;
   
+  std::shared_ptr<std::mutex> logMutex;
+  std::shared_ptr<std::condition_variable> logReady;
+  Loger loger;
+  std::thread threadLoger;
+  
+
+  virtual void saveCurrentBulk() override;  
+
 public:
-  ThreadComManager( const int bulkSize, 
-                    std::shared_ptr<std::mutex>& bulkQueue,
-                    std::shared_ptr<std::condition_variable>& newBulk):
-      CommandManager(bulkSize), bulkQueue(bulkQueue), newBulk(newBulk),
-      blockCount(0), commandCount(0), lineCount(0), finish(false) {};
-    
+  ThreadComManager(const int bulkSize);
   ThreadComManager(const ThreadComManager& other) = delete;
   ThreadComManager operator=(const ThreadComManager& other) = delete;
+  virtual ~ThreadComManager();
   
-  virtual void add(std::string&& command) override{
-    lineCount++;
-    if(command.compare("{") and command.compare("}"))
-      commandCount++;
-    CommandManager::add(std::move(command));
-  }
-  
-  void subscribe(const std::shared_ptr<ThreadSaver>& hand){
-//    hand->init(finish, this->bulkQueue, this->newBulk);
-    CommandManager::subscribe(hand);    
-  }
-  
-  virtual ~ThreadComManager(){        
-    std::cout << "Main thread(" << std::this_thread::get_id()<< "): " << lineCount << " lines, "
-      << commandCount << " commands, " << blockCount << " blocks.\n";
-  }
-
+  void add(std::string&& command);  
+  void finalize();
+  void subscribe(const std::shared_ptr<ThreadSaver>& hand);
 };
 
 #include "threadComManager_impl.h"

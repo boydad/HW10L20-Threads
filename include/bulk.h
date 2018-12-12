@@ -59,7 +59,7 @@ public:
     return firstCommandTime;
   }
   
-  std::vector<std::string>& getCommands(){
+  const std::vector<std::string>& getCommands() const{
     return commands;
   }
   

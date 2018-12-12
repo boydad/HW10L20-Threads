@@ -15,30 +15,18 @@
 #define IHANDLER_H
 
 #include <fstream>
-//#include <string>
 #include <iostream>
 #include <queue>
-#include <mutex>
-#include <condition_variable>
-
-//#include "bulk.h"
 
 #include "ihandler.h"
+#include "bulk.h"
 
 class PrintHandler: public IHandler{
   
 protected:
   std::shared_ptr<std::queue<Bulk>> bulkBuffer;
   
-  inline size_t print(std::ostream& stream, Bulk& bulk);
-  
-  //why can not be
-  //Bulk&& extractBulk(){...
-  auto extractBulk(){
-    Bulk bulk = std::move(bulkBuffer->front());      
-    bulkBuffer->pop();
-    return std::move(bulk);
-  }
+  Bulk extractBulk();
   std::string genName(const Bulk& bulk);
   
 public:
@@ -47,9 +35,9 @@ public:
   PrintHandler(const PrintHandler& other) = delete;
   PrintHandler operator=(const PrintHandler& other) = delete;
   
+  static size_t print(std::ostream& stream, const Bulk& bulk);
   void set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer) override;  
   void handle() override;
-
 };
 
 #include "printHandler_impl.h"

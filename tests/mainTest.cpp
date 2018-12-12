@@ -21,14 +21,14 @@ protected:
   
     auto bulkQueue = std::make_shared<std::mutex>();
     auto newBulk = std::make_shared<std::condition_variable>();
-    manager.reset(new ThreadComManager(bulkSize, bulkQueue, newBulk));
+    manager.reset(new ThreadComManager(bulkSize));
   
     auto threadSaver = [](std::shared_ptr<ThreadSaver> saver){
       saver->run();
     };
 
     for(int n=0; n<numThreads; ++n){
-      auto printer = std::make_shared<ThreadSaver>(finish, bulkQueue, newBulk);
+      auto printer = std::make_shared<ThreadSaver>();
       manager->subscribe(printer);
       threads.emplace_back(threadSaver, printer);
     }        
