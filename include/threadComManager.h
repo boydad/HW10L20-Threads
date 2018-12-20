@@ -38,7 +38,16 @@ private:
   virtual void saveCurrentBulk() override;  
 
 public:
-  ThreadComManager(const int bulkSize);
+  ThreadComManager(const int bulkSize):
+    CommandManager(bulkSize),  
+    bulkQueue(std::make_shared<std::mutex>()), 
+    newBulk(std::make_shared<std::condition_variable>()),
+    blockCount(0), commandCount(0), lineCount(0), finish(false),
+    logMutex(std::make_shared<std::mutex>()), 
+    logReady(std::make_shared<std::condition_variable>()),
+    loger(logMutex, logReady, finish),
+    threadLoger(&Loger::run, &loger)
+  {};    
   ThreadComManager(const ThreadComManager& other) = delete;
   ThreadComManager operator=(const ThreadComManager& other) = delete;
   virtual ~ThreadComManager();

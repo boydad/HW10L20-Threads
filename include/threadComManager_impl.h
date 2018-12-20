@@ -16,16 +16,6 @@
 
 #include "threadComManager.h"
 
-  ThreadComManager::ThreadComManager(const int bulkSize):
-    CommandManager(bulkSize),  
-    bulkQueue(std::make_shared<std::mutex>()), 
-    newBulk(std::make_shared<std::condition_variable>()),
-    blockCount(0), commandCount(0), lineCount(0), finish(false),
-    logMutex(std::make_shared<std::mutex>()), 
-    logReady(std::make_shared<std::condition_variable>()),
-    loger(logMutex, logReady, finish),
-    threadLoger(&Loger::run, &loger)
-  {}
 
 void ThreadComManager::saveCurrentBulk()
 {  
@@ -55,10 +45,10 @@ void ThreadComManager::add(std::string&& command)
 
 ThreadComManager::~ThreadComManager()
 {  
-  threadLoger.join();
   std::cout << "Main thread(" << std::this_thread::get_id()<< "): "
     << blockCount << " blocks, " << commandCount << " commands, " 
-    << lineCount << " lines\n";    
+    << lineCount << " lines\n";
+  threadLoger.join();
 }
 
 void ThreadComManager::finalize()
@@ -66,7 +56,6 @@ void ThreadComManager::finalize()
    CommandManager::finalize();
    finish = true;
    newBulk->notify_all();
-   logReady->notify_all();
 }
 
 void ThreadComManager::subscribe(const std::shared_ptr<ThreadSaver>& hand)

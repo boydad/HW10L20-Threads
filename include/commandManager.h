@@ -39,7 +39,7 @@ protected:
   std::shared_ptr<std::queue<Bulk>> bulkBuffer;
   virtual void saveCurrentBulk();
   
-  
+
 public:
   CommandManager(const int bulkSize);
   CommandManager(const CommandManager& other) = delete;

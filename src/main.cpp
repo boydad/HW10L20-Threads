@@ -7,15 +7,14 @@
 
 #include "threadComManager.h"
 #include "threadSaver.h"
-#include "printHandler.h"
 
-int main(int argc, char** argv){	
+int main(int argc, char** argv){    
   if(argc != 2)
     throw std::logic_error("Incorrect parameter number");
     
   const int bulkSize = atoi(argv[1]);
   ThreadComManager tmanager(bulkSize);
-  
+
   const int numThreads = 2;
   std::vector<std::thread> threads;
   threads.reserve(numThreads);
@@ -42,4 +41,4 @@ int main(int argc, char** argv){
     th.join();
   
   return 0;
-}
+} 
