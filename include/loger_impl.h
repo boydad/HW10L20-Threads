@@ -23,12 +23,12 @@ Loger::Loger( const std::shared_ptr<std::mutex>& mutexLog,
 mutexLog(mutexLog), logReady(logReady), bulk(nullptr), finish(finish)
 {}
  
-inline void Loger::set(Bulk* bulk)
+void Loger::set(Bulk* bulk)
 {
   this->bulk = bulk;
 }
  
-inline bool Loger::isSaved()
+bool Loger::isSaved()
 {
   return bulk == nullptr;
 }

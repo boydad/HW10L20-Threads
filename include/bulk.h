@@ -69,6 +69,7 @@ public:
     return commands.size();
   }
 };
+
 #include "global.h"
 
 void print(std::ostream& stream, const Bulk& bulk)

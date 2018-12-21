@@ -44,9 +44,9 @@ public:
   ThreadComManager operator=(const ThreadComManager& other) = delete;
   virtual ~ThreadComManager();
   
-  void add(std::string&& command);  
-  void finalize();
-  void subscribe(const std::shared_ptr<BaseThreadHandler>& hand);
+  inline void add(std::string&& command);  
+  inline void finalize();
+  inline void subscribe(const std::shared_ptr<BaseThreadHandler>& hand);
 };
 
 #include "threadComManager_impl.h"

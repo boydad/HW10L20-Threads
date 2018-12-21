@@ -32,12 +32,14 @@ private:
   inline void addCustomBulk();
   inline void delCustomBulk();
   inline void addInBulk(std::string&& command);
-  inline bool isBulkFull();  
+  inline bool isBulkFull();    
   
 protected:  
   std::vector< std::shared_ptr<IHandler> > handlers;
   Bulk bulk;
   std::shared_ptr<std::queue<Bulk>> bulkBuffer;
+
+  inline void finalize();  
   virtual void saveCurrentBulk();
   
 
@@ -47,9 +49,8 @@ public:
   CommandManager operator=(const CommandManager& other) = delete;
   virtual ~CommandManager();
   
-  void add(std::string&& command);  
-  void subscribe(const std::shared_ptr<IHandler>& hand);  
-  inline void finalize();  
+  inline void add(std::string&& command);  
+  inline void subscribe(const std::shared_ptr<IHandler>& hand);    
 };
 
 #include "commandManagar_impl.h"

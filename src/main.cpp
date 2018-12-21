@@ -6,7 +6,7 @@
 
 
 #include "threadComManager.h"
-#include "BaseThreadHandler.h"
+#include "ThreadSaver.h"
 
 std::mutex mu_cout;
 
@@ -26,7 +26,6 @@ int main(int argc, char** argv){
   
   for(std::string command; std::getline(std::cin, command); )
     tmanager.add(std::move(command));  
-  // tmanager.finalize();
-
+  
   return 0;
 } 

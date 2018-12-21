@@ -17,7 +17,6 @@
 #include <memory>
 #include <thread>
 
-#include "BaseThreadHandler.h"
 #include "bulk.h"
 
 void BaseThreadHandler::init(std::shared_ptr<bool>& finish, 

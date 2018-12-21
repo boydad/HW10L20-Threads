@@ -38,7 +38,7 @@ public:
   
   inline void set(Bulk* bulk); 
   inline bool isSaved();  
-  void run();
+  inline void run();
   
 };
 

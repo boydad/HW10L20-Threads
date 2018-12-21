@@ -11,8 +11,7 @@
  * Created on 11 декабря 2018 г., 10:46
  */
 
-#ifndef THREADSAVER_H
-#define THREADSAVER_H
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -36,42 +35,16 @@ private:
   bool isLaunched{false};
   void loop();
 
-  void handleOneBulkFromBuffer(std::unique_lock<std::mutex>& lock);
-  Bulk extractBulk(std::unique_lock<std::mutex>& lock);
-  // virtual void handleBulk(Bulk& bulk){std::cout << "TTTTTTT";};
+  inline void handleOneBulkFromBuffer(std::unique_lock<std::mutex>& lock);
+  inline Bulk extractBulk(std::unique_lock<std::mutex>& lock);
   
 public:  
-  void init(std::shared_ptr<bool>& finish, 
+  inline void init(std::shared_ptr<bool>& finish, 
             const std::shared_ptr<std::mutex>& bulkQueue, 
-            const std::shared_ptr<std::condition_variable>& newBulk);
-   
-  void launch();
-  void finalize();
+            const std::shared_ptr<std::condition_variable>& newBulk);   
+  inline void launch();
+  virtual void finalize() override;
   virtual ~BaseThreadHandler();
 };
 
-
-#include <sstream>
-#include "printHandler.h"
-
-class ThreadSaver: public BaseThreadHandler{
-protected:
-  virtual void handleBulk(Bulk& bulk) override final
-  {  
-    std::stringstream name;
-    name << "thread(" << std::this_thread::get_id() << ")-" << PrintHandler::genName(bulk);
-    std::ofstream log(name.str(), std::ofstream::app);
-
-    log << "bulk: ";
-    print(log, bulk);
-  //  this->print(std::cout, bulk);   
-  }
-public:
-  virtual ~ThreadSaver(){};
-};
-
-
-
 #include "BaseThreadHandler_impl.h"
-#endif /* THREADSAVER_H */
-

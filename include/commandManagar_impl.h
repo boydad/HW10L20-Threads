@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <memory>
-#include "commandManager.h"
 
 CommandManager::CommandManager(const int bulkSize): 
     maxBuffSize(bulkSize), 
