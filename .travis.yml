@@ -14,7 +14,7 @@ addons:
      
 script:
   - cmake -DCMAKE_BUILD_TYPE=Release .
-  - cmake --build .
+  - make VERBOSE=1
   - cmake --build . --target package
 
 before_deploy: 
