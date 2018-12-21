@@ -73,8 +73,7 @@ public:
 
 void print(std::ostream& stream, const Bulk& bulk)
 {   
-  std::string sep{""};      
-  // std::lock_guard<std::mutex> lock{mu_cout};
+  std::string sep{""};        
   for(const auto& command: bulk.getCommands()){    
     stream << sep << command;
     sep = ", ";    
