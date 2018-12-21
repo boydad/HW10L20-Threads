@@ -11,15 +11,14 @@ protected:
   std::shared_ptr<std::queue<Bulk>> bulkBuffer;
   
   virtual void handleBulk(Bulk& bulk) = 0;
-  Bulk extractBulk();
+  inline Bulk extractBulk();
   
 public:
   BaseHandler();
   virtual ~BaseHandler() = default;
   BaseHandler(const BaseHandler& other) = delete;
-  // BaseHandler operator=(const BaseHandler& other) = delete;
     
-  void set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer) override;  
+  inline void set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer) override;  
   void handle() override;
 };
 
