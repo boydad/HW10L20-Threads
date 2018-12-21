@@ -1,20 +1,10 @@
 dist: trusty
 language: cpp
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - gcc-7
-      - g++-7
-      - cmake
-      - libgtest-dev
-    env:
-      - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
      
 script:
   - cmake -DCMAKE_BUILD_TYPE=Release .
-  - make VERBOSE=1
+  - make VERBOSE=1 #cmake --build .
   - cmake --build . --target package
 
 before_deploy: 
