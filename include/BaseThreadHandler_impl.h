@@ -14,6 +14,8 @@
 #pragma once
 
 #include <stdexcept>
+#include <memory>
+#include <thread>
 
 #include "BaseThreadHandler.h"
 #include "bulk.h"
