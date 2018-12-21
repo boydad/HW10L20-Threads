@@ -15,22 +15,37 @@
 #define THREADCOMMANAGER_IMPL_H
 
 #include "threadComManager.h"
+#include "global.h"
 
+ThreadComManager::ThreadComManager(const int bulkSize):
+  CommandManager(bulkSize),  
+  bulkQueue(std::make_shared<std::mutex>()), 
+  newBulk(std::make_shared<std::condition_variable>()),
+  blockCount(0), commandCount(0), lineCount(0), finish(new bool(false)),
+  logMutex(std::make_shared<std::mutex>()), 
+  logReady(std::make_shared<std::condition_variable>()),
+  loger(logMutex, logReady, finish),
+  threadLoger(&Loger::run, &loger)
+{}
 
 void ThreadComManager::saveCurrentBulk()
 {  
   if(!bulk.isEmpty()){
-    loger.set(&bulk);
-    logReady->notify_one();
-    while(!loger.isSaved()){
+
+    {
       std::unique_lock<std::mutex> lock{*logMutex};     
-      logReady->wait(lock);
+      loger.set(&bulk);
+      logReady->notify_one();
+      while(!loger.isSaved())           
+          logReady->wait(lock);
     }
+    
     {
       std::lock_guard<std::mutex> lock{*bulkQueue};
       bulkBuffer->push(std::move(bulk));
     }
     newBulk->notify_one();  
+    
     this->blockCount++;    
   }
 }
@@ -45,23 +60,29 @@ void ThreadComManager::add(std::string&& command)
 
 ThreadComManager::~ThreadComManager()
 {  
+  this->finalize();
+  std::lock_guard<std::mutex> lock{mu_cout}; 
   std::cout << "Main thread(" << std::this_thread::get_id()<< "): "
     << blockCount << " blocks, " << commandCount << " commands, " 
     << lineCount << " lines\n";
-  threadLoger.join();
 }
 
 void ThreadComManager::finalize()
 {
    CommandManager::finalize();
-   finish = true;
+   *finish = true;
+   logReady->notify_all();
    newBulk->notify_all();
+
+  threadLoger.join();
+  for(auto& handler: this->handlers)
+    handler->finalize();
 }
 
-void ThreadComManager::subscribe(const std::shared_ptr<ThreadSaver>& hand)
+void ThreadComManager::subscribe(const std::shared_ptr<BaseThreadHandler>& hand)
 {
-  hand->init(finish, bulkQueue, newBulk);
   CommandManager::subscribe(hand);    
+  hand->init(finish, bulkQueue, newBulk);
+  hand->launch();
 }
 #endif /* THREADCOMMANAGER_IMPL_H */
-

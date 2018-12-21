@@ -1,19 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+#pragma once
 
-/* 
- * File:   ihandle.h
- * Author: boyda
- *
- * Created on 11 декабря 2018 г., 10:43
- */
-
-#ifndef IHANDLE_H
-#define IHANDLE_H
-
+#include <memory>
+#include <queue>
 #include "bulk.h"
 
 class IHandler{
@@ -22,8 +10,5 @@ public:
   
   virtual void handle() = 0;
   virtual void set(const std::shared_ptr<std::queue<Bulk>>& bulkBuffer) = 0;
+  virtual void finalize() {};
 };
-
-
-#endif /* IHANDLE_H */
-

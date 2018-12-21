@@ -26,7 +26,7 @@ class CommandManager{
 private:
   size_t maxBuffSize;
   size_t numOpenBracket;
-  std::vector< std::shared_ptr<IHandler> > handlers;
+  
 
   inline void notify();
   inline void addCustomBulk();
@@ -35,6 +35,7 @@ private:
   inline bool isBulkFull();  
   
 protected:  
+  std::vector< std::shared_ptr<IHandler> > handlers;
   Bulk bulk;
   std::shared_ptr<std::queue<Bulk>> bulkBuffer;
   virtual void saveCurrentBulk();

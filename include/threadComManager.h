@@ -17,9 +17,10 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+#include <thread>
 
 #include "commandManager.h"
-#include "threadSaver.h"
+#include "BaseThreadHandler.h"
 #include "loger.h"
 
 class ThreadComManager: public CommandManager{
@@ -27,7 +28,7 @@ private:
   std::shared_ptr<std::mutex> bulkQueue;
   std::shared_ptr<std::condition_variable> newBulk;
   size_t blockCount, commandCount, lineCount;
-  bool finish;
+  std::shared_ptr<bool> finish;
   
   std::shared_ptr<std::mutex> logMutex;
   std::shared_ptr<std::condition_variable> logReady;
@@ -38,23 +39,14 @@ private:
   virtual void saveCurrentBulk() override;  
 
 public:
-  ThreadComManager(const int bulkSize):
-    CommandManager(bulkSize),  
-    bulkQueue(std::make_shared<std::mutex>()), 
-    newBulk(std::make_shared<std::condition_variable>()),
-    blockCount(0), commandCount(0), lineCount(0), finish(false),
-    logMutex(std::make_shared<std::mutex>()), 
-    logReady(std::make_shared<std::condition_variable>()),
-    loger(logMutex, logReady, finish),
-    threadLoger(&Loger::run, &loger)
-  {};    
+  ThreadComManager(const int bulkSize);   
   ThreadComManager(const ThreadComManager& other) = delete;
   ThreadComManager operator=(const ThreadComManager& other) = delete;
   virtual ~ThreadComManager();
   
   void add(std::string&& command);  
   void finalize();
-  void subscribe(const std::shared_ptr<ThreadSaver>& hand);
+  void subscribe(const std::shared_ptr<BaseThreadHandler>& hand);
 };
 
 #include "threadComManager_impl.h"

@@ -16,6 +16,7 @@
 #include <chrono>
 #include <vector>
 #include <string>
+#include <iostream>
 
 
 class Bulk{
@@ -46,6 +47,7 @@ public:
     commands.clear();
   }
   
+
   inline bool isEmpty(){
     return empty;
   }
@@ -67,3 +69,15 @@ public:
     return commands.size();
   }
 };
+#include "global.h"
+
+void print(std::ostream& stream, const Bulk& bulk)
+{   
+  std::string sep{""};      
+  // std::lock_guard<std::mutex> lock{mu_cout};
+  for(const auto& command: bulk.getCommands()){    
+    stream << sep << command;
+    sep = ", ";    
+  }  
+  stream << "\n";    
+}
