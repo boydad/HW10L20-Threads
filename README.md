@@ -1,4 +1,5 @@
-# CMD with Threads
+# Пакетная обработка команд - Многопоточная версия
+[![Build Status](https://travis-ci.org/boydad/HW10L20-Threads.svg?branch=master)](https://travis-ci.org/boydad/HW10L20-Threads)
 
 
 ## Условие задания
