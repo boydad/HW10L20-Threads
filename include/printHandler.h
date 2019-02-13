@@ -27,7 +27,10 @@ public:
   {
     const auto time = std::chrono::system_clock::to_time_t(bulk.getTime());
     char name[17];
-    strftime(name, 17, "bulk%X.log", localtime(&time));    
+    tm ltime;
+    localtime_r(&time, &ltime);
+
+    strftime(name, 17, "bulk%X.log", &ltime);    
     return std::string(name);
   }
 };
