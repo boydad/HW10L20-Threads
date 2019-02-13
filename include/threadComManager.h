@@ -25,13 +25,13 @@
 
 class ThreadComManager: public CommandManager{
 private:
-  std::shared_ptr<std::mutex> bulkQueue;
-  std::shared_ptr<std::condition_variable> newBulk;
+  std::mutex bulkQueue;
+  std::condition_variable newBulk;
   size_t blockCount, commandCount, lineCount;
-  std::shared_ptr<bool> finish;
+  bool finish;
   
-  std::shared_ptr<std::mutex> logMutex;
-  std::shared_ptr<std::condition_variable> logReady;
+  std::mutex logMutex;
+  std::condition_variable logReady;
   Loger loger;
   std::thread threadLoger;
   

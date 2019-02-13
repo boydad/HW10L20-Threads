@@ -24,17 +24,17 @@
 #include "printHandler.h"
 
 class Loger{
-  std::shared_ptr<std::mutex> mutexLog;
-  std::shared_ptr<std::condition_variable> logReady;
+  std::mutex* mutexLog;
+  std::condition_variable* logReady;
   Bulk* bulk;
-  std::shared_ptr<bool> finish;
+  bool* finish;
   
   inline void save();  
   
 public:
-  Loger(const std::shared_ptr<std::mutex>& mutexLog,
-        const std::shared_ptr<std::condition_variable>& logReady,
-        std::shared_ptr<bool>& finish);
+  Loger(std::mutex* mutexLog,
+        std::condition_variable* logReady,
+        bool* finish);
   
   inline void set(Bulk* bulk); 
   inline bool isSaved();  

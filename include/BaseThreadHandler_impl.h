@@ -19,9 +19,9 @@
 
 #include "bulk.h"
 
-void BaseThreadHandler::init(std::shared_ptr<bool>& finish, 
-                      const std::shared_ptr<std::mutex>& bulkQueue, 
-                      const std::shared_ptr<std::condition_variable>& newBulk)
+void BaseThreadHandler::init(bool* finish, 
+                      std::mutex* bulkQueue, 
+                      std::condition_variable* newBulk)
 {
   this->finish = finish;
   this->bulkQueue = bulkQueue;

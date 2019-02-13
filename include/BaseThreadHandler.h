@@ -25,11 +25,12 @@ class BaseThreadHandler: public BaseHandler{
 
 private:
   size_t blocksCount{0};
-  size_t commandsCount{0};
-  std::shared_ptr<bool> finish{nullptr};
+  size_t commandsCount{0};  
   bool isInitialized{false};
-  std::shared_ptr<std::mutex> bulkQueue{nullptr};
-  std::shared_ptr<std::condition_variable> newBulk{nullptr};
+  
+  bool* finish{nullptr};
+  std::mutex* bulkQueue{nullptr};
+  std::condition_variable* newBulk{nullptr};
 
   std::unique_ptr<std::thread> thread;
   bool isLaunched{false};
@@ -39,9 +40,9 @@ private:
   inline Bulk extractBulk(std::unique_lock<std::mutex>& lock);
   
 public:  
-  inline void init(std::shared_ptr<bool>& finish, 
-            const std::shared_ptr<std::mutex>& bulkQueue, 
-            const std::shared_ptr<std::condition_variable>& newBulk);   
+  inline void init(bool* finish, 
+            std::mutex* bulkQueue, 
+            std::condition_variable* newBulk);   
   inline void launch();
   virtual void finalize() override;
   virtual ~BaseThreadHandler();

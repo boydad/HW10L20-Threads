@@ -19,12 +19,8 @@
 
 ThreadComManager::ThreadComManager(const int bulkSize):
   CommandManager(bulkSize),  
-  bulkQueue(std::make_shared<std::mutex>()), 
-  newBulk(std::make_shared<std::condition_variable>()),
-  blockCount(0), commandCount(0), lineCount(0), finish(new bool(false)),
-  logMutex(std::make_shared<std::mutex>()), 
-  logReady(std::make_shared<std::condition_variable>()),
-  loger(logMutex, logReady, finish),
+  blockCount(0), commandCount(0), lineCount(0), finish(false),
+  loger(&logMutex, &logReady, &finish),
   threadLoger(&Loger::run, &loger)
 {}
 
@@ -33,18 +29,18 @@ void ThreadComManager::saveCurrentBulk()
   if(!bulk.isEmpty()){
 
     {
-      std::unique_lock<std::mutex> lock{*logMutex};     
+      std::unique_lock<std::mutex> lock{logMutex};     
       loger.set(&bulk);
-      logReady->notify_one();
+      logReady.notify_one();
       while(!loger.isSaved())           
-          logReady->wait(lock);
+          logReady.wait(lock);
     }
     
     {
-      std::lock_guard<std::mutex> lock{*bulkQueue};
+      std::lock_guard<std::mutex> lock{bulkQueue};
       bulkBuffer->push(std::move(bulk));
     }
-    newBulk->notify_one();  
+    newBulk.notify_one();  
     
     this->blockCount++;    
   }
@@ -70,9 +66,9 @@ ThreadComManager::~ThreadComManager()
 void ThreadComManager::finalize()
 {
    CommandManager::finalize();
-   *finish = true;
-   logReady->notify_all();
-   newBulk->notify_all();
+   finish = true;
+   logReady.notify_all();
+   newBulk.notify_all();
 
   threadLoger.join();
   for(auto& handler: this->handlers)
@@ -82,7 +78,7 @@ void ThreadComManager::finalize()
 void ThreadComManager::subscribe(const std::shared_ptr<BaseThreadHandler>& hand)
 {
   CommandManager::subscribe(hand);    
-  hand->init(finish, bulkQueue, newBulk);
+  hand->init(&finish, &bulkQueue, &newBulk);
   hand->launch();
 }
 #endif /* THREADCOMMANAGER_IMPL_H */

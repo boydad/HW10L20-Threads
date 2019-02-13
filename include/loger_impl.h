@@ -17,9 +17,9 @@
 
 #include <loger.h>
 
-Loger::Loger( const std::shared_ptr<std::mutex>& mutexLog,
-              const std::shared_ptr<std::condition_variable>& logReady,
-              std::shared_ptr<bool>& finish):
+Loger::Loger(std::mutex* mutexLog,
+        std::condition_variable* logReady,
+        bool* finish):
 mutexLog(mutexLog), logReady(logReady), bulk(nullptr), finish(finish)
 {}
  
