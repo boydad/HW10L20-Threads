@@ -34,13 +34,13 @@ void BaseThreadHandler::launch()
 {
   thread = std::make_unique<std::thread>(&BaseThreadHandler::loop, this);
   isLaunched = true;
-}  
+}
 
 void BaseThreadHandler::loop()
 {  
   if(!isInitialized)
     throw std::logic_error("BaseThreadHandler: run before initialization!");
-    
+  
   while(!*finish){
     std::unique_lock<std::mutex> lock{*bulkQueue};
 
